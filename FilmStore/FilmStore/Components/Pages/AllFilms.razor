@@ -2,60 +2,71 @@
 @attribute [StreamRendering]
 @inject NavigationManager nm
 @rendermode InteractiveServer
+@inject SessionService sessionService
 
 <PageTitle>Films</PageTitle>
 
 <h1>Films</h1>
 
-Sort:
-<button class="btn btn-primary" @onclick="(() => SortByTitle())"> Tytuł</button>
-<button class="btn btn-primary" @onclick="(() => SortByType())"> Gatunek</button>
-
-<EditForm Model="filters" OnSubmit="Filter">
-    <div>
-        <label for="title">Tytuł</label>
-        <InputText id="title" @bind-Value="filters.Title" class="form-control"></InputText>
-    </div>
-    <div>
-        <label for="type">Gatunek</label>
-        <InputText id="type" @bind-Value="filters.Type" class="form-control"></InputText>
-    </div>
-    <button type="submit" class="btn btn-primary m-3"> Filtruj </button>
-</EditForm>
-
-<p>List of all films in store:</p>
-
-@if (films == null)
+@if (user != null)
 {
-    <p><em>Loading...</em></p>
+
+Sort:
+    <button class="btn btn-primary" @onclick="(() => SortByTitle())"> Tytuł</button>
+    <button class="btn btn-primary" @onclick="(() => SortByType())"> Gatunek</button>
+
+    <EditForm Model="filters" OnSubmit="Filter">
+        <div>
+            <label for="title">Tytuł</label>
+            <InputText id="title" @bind-Value="filters.Title" class="form-control"></InputText>
+        </div>
+        <div>
+            <label for="type">Gatunek</label>
+            <InputText id="type" @bind-Value="filters.Type" class="form-control"></InputText>
+        </div>
+        <button type="submit" class="btn btn-primary m-3"> Filtruj </button>
+    </EditForm>
+
+    <p>List of all films in store:</p>
+
+    @if (films == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var film in films)
+            {
+                <li class="media my-3 card">
+                    <div class="media-body m-3">
+                        <h5>@film.Title</h5>
+                        <p> Reżyser: @film.Director - Gatunek: @film.Type - czas trwaina: @film.Time min.</p>
+                        @if (film.IsInStock)
+                        {
+                            <p style="color: green"> Dostępny</p>
+                            <button class="btn btn-primary mx-2" @onclick="(() => RentAGirlfriend(film.Id))"> Wypożycz </button>
+                        }
+                        else
+                        {
+                            <p style="color: red"> Niedostępny</p>
+                        }
+                        <button class="btn btn-primary" @onclick="(() => ShowFilm(film.Id))"> info </button>
+                    </div>
+                </li>
+            }
+        </ul>
+    }
 }
 else
 {
-    <ul class="list-group">
-        @foreach(var film in films)
-        {
-            <li class="media my-3 card">
-                <div class="media-body m-3">
-                    <h5>@film.Title</h5>
-                    <p> Reżyser: @film.Director - Gatunek: @film.Type - czas trwaina: @film.Time min.</p>
-                    @if (film.IsInStock)
-                    {
-                        <p style="color: green"> Dostępny</p>
-                    }
-                    else
-                    {
-                        <p style="color: red"> Niedostępny</p>
-                    }
-                    <button class="btn btn-primary" @onclick="(() => ShowFilm(film.Id))"> info </button>
-                </div>
-            </li>
-        }
-    </ul>
+    <h1> Acces not allowed!!!</h1>
 }
 
 @code {
     private IEnumerable<FilmDto>? films;
     private FilmFilterDto filters = new FilmFilterDto();
+    private UserInfo? user;
 
     private IFilmStoreService _filmService;
 
@@ -64,6 +75,7 @@ else
     {
         _filmService = new FilmStoreService();
         films = _filmService.GetAllFilms();
+        user = sessionService.GetUser();
     }
 
     public void ShowFilm(string id)
@@ -92,5 +104,10 @@ else
     public void SortByType()
     {
         films = _filmService.GetAllFilms().OrderBy(f => f.Type);
+    }
+
+    public void RentAGirlfriend(string filmId)
+    {
+        nm.NavigateTo($"RentAGirlfriend/{filmId}");
     }
 }

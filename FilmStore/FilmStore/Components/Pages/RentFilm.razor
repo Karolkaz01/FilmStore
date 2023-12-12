@@ -1,0 +1,63 @@
+﻿@page "/RentAGirlfriend/{filmId}"
+@attribute [StreamRendering]
+@inject NavigationManager nm
+@rendermode InteractiveServer
+
+<h3>RentFilm</h3>
+
+<EditForm Model="rent" OnSubmit="RentAGirlfriend">
+    <div>
+        <label for="clientFirstName">Imie</label>
+        <InputText id="clientFirstName" @bind-Value="rent.ClientFirstName" class="form-control"></InputText>
+    </div>
+    <div>
+        <label for="clientLastName">Nazwisko</label>
+        <InputText id="clientLastName" @bind-Value="rent.ClientLastName" class="form-control"></InputText>
+    </div>
+    <button type="submit" class="btn btn-primary m-3"> Wypożycz </button>
+</EditForm>
+
+<span style="color: red">@message</span>
+
+@code {
+    [Parameter]
+    public string filmId { get; set; }
+
+    private RentedFilmDto rent = new RentedFilmDto();
+    private string message = "";
+
+    private IRentService _rentService;
+    private IClientService _clientService;
+    private IFilmStoreService _filmService;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _rentService = new RentService();
+        _clientService = new ClientService();
+        _filmService = new FilmStoreService();
+    }
+
+    public void RentAGirlfriend()
+    {
+        var film = _filmService.GetSingleFilm(filmId);
+        var allClients = _clientService.GetAllClients();
+        var client = allClients.FirstOrDefault(c => (c.FirstName == rent.ClientFirstName) && (c.LastName == rent.ClientLastName));
+
+        if (client != null && film != null)
+        {
+            if (!film.IsInStock || client.RentedFilms >= 2)
+            {
+                message = "Nie można wypożyczyć filmu!";
+                return;
+            }
+
+            _clientService.AddOneRentedFilm(client.Id);
+            _filmService.RentFilm(filmId);
+            _rentService.RentAGirlfriend(client, film);
+            nm.NavigateTo("AllFilms");
+            return;
+        }
+        message = "Wrong Data!";
+
+    }
+}

@@ -9,7 +9,7 @@ namespace Shared.Services
     public class RentService : IRentService
     {
         private IMongoClient _dbContext { get; set; }
-        private IEnumerable<RentedFilmDto> _rentsList;
+        private IEnumerable<RentedFilmDto> rentsList;
 
         public RentService()
         {
@@ -17,17 +17,17 @@ namespace Shared.Services
             _dbContext = context.GetMongoDbContext();
             var collection = _dbContext.GetDatabase("FilmStoreDB").GetCollection<RentedFilmDto>("Rents");
             var filters = Builders<RentedFilmDto>.Filter.Empty;
-            _rentsList = collection.Find(filters).ToList();
+            rentsList = collection.Find(filters).ToList();
         }
 
         public IEnumerable<RentedFilmDto> GetAllRents()
         {
-            return _rentsList;
+            return rentsList;
         }
 
         public RentedFilmDto? GetSingleRent(string id)
         {
-            return _rentsList.FirstOrDefault(r => r.Id == id);
+            return rentsList.FirstOrDefault(r => r.Id == id);
         }
 
         public void ReturnFilm(string id)
@@ -38,12 +38,28 @@ namespace Shared.Services
             collection.UpdateOne(filters, updates);
             RefreshData();
         }
-        
+
+        public void RentAGirlfriend(ClientDto client, FilmDto film)
+        {
+            var rent = new RentedFilmDto();
+            rent.ClientAdressEmail = client.AdressEmail;
+            rent.ClientFirstName = client.FirstName;
+            rent.ClientLastName = client.LastName;
+            rent.FilmTitle = film.Title;
+            rent.RentDate = DateTime.Now;
+            rent.PlanedReturnDate = DateTime.Now.AddDays(2);
+            rent.ReturnDate = null;
+
+            var collection = _dbContext.GetDatabase("FilmStoreDB").GetCollection<RentedFilmDto>("Rents");
+            collection.InsertOne(rent);
+            RefreshData();
+        }
+
         public void RefreshData()
         {
             var collection = _dbContext.GetDatabase("FilmStoreDB").GetCollection<RentedFilmDto>("Rents");
             var filters = Builders<RentedFilmDto>.Filter.Empty;
-            _rentsList = collection.Find(filters).ToList();
+            rentsList = collection.Find(filters).ToList();
         }
     }
 }

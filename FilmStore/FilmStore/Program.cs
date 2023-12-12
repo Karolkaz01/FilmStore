@@ -1,4 +1,6 @@
+using Blazored.SessionStorage;
 using FilmStore.Components;
+using Shared.Services;
 
 namespace FilmStore
 {
@@ -11,6 +13,9 @@ namespace FilmStore
             // Add services to the container.
             builder.Services.AddRazorComponents()
                 .AddInteractiveServerComponents();
+
+            builder.Services.AddBlazoredSessionStorage();
+            builder.Services.AddSingleton<SessionService>();
 
             var app = builder.Build();
 

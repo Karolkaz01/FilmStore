@@ -7,6 +7,9 @@ namespace Shared.Interfaces
     {
         IEnumerable<FilmDto> GetAllFilms();
         FilmDto? GetSingleFilm(string id);
+        void RentFilm(string id);
+        void ReturnFilm(string id);
+        void DeleteFilm(string id);
         void RefreshData();
     }
 }

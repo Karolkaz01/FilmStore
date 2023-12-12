@@ -7,6 +7,7 @@ namespace Shared.Interfaces
         IEnumerable<RentedFilmDto> GetAllRents();
         RentedFilmDto? GetSingleRent(string id);
         void ReturnFilm(string id);
+        void RentAGirlfriend(ClientDto client, FilmDto film);
         void RefreshData();
     }
 }

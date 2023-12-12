@@ -22,16 +22,16 @@ build_property._RazorSourceGeneratorDebug =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xBcHAucmF6b3I=
 build_metadata.AdditionalFiles.CssScope = 
 
+[D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/AllClients.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbGxDbGllbnRzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
 [D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/AllFilms.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbGxGaWxtcy5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/AllRents.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xBbGxSZW50cy5yYXpvcg==
-build_metadata.AdditionalFiles.CssScope = 
-
-[D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/Counter.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDb3VudGVyLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/Error.razor]
@@ -46,8 +46,8 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
 build_metadata.AdditionalFiles.CssScope = 
 
-[D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/Weather.razor]
-build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXZWF0aGVyLnJhem9y
+[D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Pages/RentFilm.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xSZW50RmlsbS5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [D:/Informatyka/Xieski/FilmStore/FilmStore/FilmStore/Components/Routes.razor]

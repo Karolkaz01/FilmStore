@@ -1,6 +1,7 @@
 ﻿@page "/Film"
 @page "/Film/{id}"
 @attribute [StreamRendering]
+@inject NavigationManager nm
 
 <PageTitle>Films</PageTitle>
 
@@ -22,6 +23,7 @@
         @if(film.IsInStock)
         {
             <p style="color: green"> Dostępny</p>
+            <button class="btn btn-primary btn-danger" @onclick="(() => DeleteFilm(film.Id))"> Usuń Film </button>
         }
         else
         {
@@ -48,5 +50,11 @@ else
     {
         _filmService = new FilmStoreService();
         film = _filmService.GetSingleFilm(id);
+    }
+
+    private void DeleteFilm(string filmId)
+    {
+        _filmService.DeleteFilm(filmId);
+        nm.NavigateTo($"AllFilms");
     }
 }

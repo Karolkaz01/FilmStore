@@ -1,71 +1,87 @@
 ﻿@page "/AllRents"
 @attribute [StreamRendering]
 @rendermode InteractiveServer
+@inject SessionService sessionService
 
 <PageTitle>Rents</PageTitle>
 
 <h1>Rents</h1>
 
-Sort:
-<button class="btn btn-primary" @onclick="(() => SortByClientLastName())"> Nazwisko </button>
-<button class="btn btn-primary" @onclick="(() => SortByRentDate())"> Data wypożyczenia</button>
-
-<EditForm Model="filters" OnSubmit="Filter">
-    <div>
-        <label for="title">Nazwisko</label>
-        <InputText id="title" @bind-Value="filters.ClientLastName" class="form-control"></InputText>
-    </div>
-    <div>
-        <label for="type">Tytuł</label>
-        <InputText id="type" @bind-Value="filters.Title" class="form-control"></InputText>
-    </div>
-    <div>
-        <label for="title">Data wypożyczenia</label>
-        <InputDate id="title" @bind-Value="filters.RentDate" class="form-control"></InputDate>
-    </div>
-    <button type="submit" class="btn btn-primary m-3"> Filtruj </button>
-</EditForm>
-
-@if (rents == null)
+@if (user != null)
 {
-    <p><em>Loading...</em></p>
+
+    <span>Sort:</span>
+    <button class="btn btn-primary" @onclick="(() => SortByClientLastName())"> Nazwisko </button>
+    <button class="btn btn-primary" @onclick="(() => SortByRentDate())"> Data wypożyczenia</button>
+
+    <EditForm Model="filters" OnSubmit="Filter">
+        <div>
+            <label for="title">Nazwisko</label>
+            <InputText id="title" @bind-Value="filters.ClientLastName" class="form-control"></InputText>
+        </div>
+        <div>
+            <label for="type">Tytuł</label>
+            <InputText id="type" @bind-Value="filters.Title" class="form-control"></InputText>
+        </div>
+        <div>
+            <label for="title">Data wypożyczenia</label>
+            <InputDate id="title" @bind-Value="filters.RentDate" class="form-control"></InputDate>
+        </div>
+        <button type="submit" class="btn btn-primary m-3"> Filtruj </button>
+    </EditForm>
+
+
+    @if (rents == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <ul class="list-group">
+            @foreach (var rent in rents)
+            {
+                <li class="media my-3 card">
+                    <div class="media-body m-3">
+                        <h5>@rent.FilmTitle</h5>
+                        <p> Imie i nazwisko : @rent.ClientFirstName @rent.ClientLastName </p>
+                        <p> Data wypozyczenia: @rent.RentDate.ToString() </p>
+                        <p> Planowana data zwrotu: @rent.PlanedReturnDate.ToString()</p>
+                        @if (rent.ReturnDate != null)
+                        {
+                            <p> Data zwrotu: @rent.ReturnDate</p>
+                        }
+                        else
+                        {
+                            <p> Data zwrotu: <span style="color: red"> N/A </span></p>
+                            <button class="btn btn-primary btn-danger" @onclick="(() => ReturnFilm(rent))"> Zwróć </button>
+                        }
+                    </div>
+                </li>
+            }
+        </ul>
+    }
 }
 else
 {
-    <ul class="list-group">
-        @foreach (var rent in rents)
-        {
-            <li class="media my-3 card">
-                <div class="media-body m-3">
-                    <h5>@rent.FilmTitle</h5>
-                    <p> Imie i nazwisko : @rent.ClientFirstName @rent.ClientLastName </p>
-                    <p> Data wypozyczenia: @rent.RentDate.ToString() </p>
-                    <p> Planowana data zwrotu: @rent.PlanedReturnDate.ToString()</p>
-                    @if (rent.ReturnDate != null)
-                    {
-                        <p> Data zwrotu: @rent.ReturnDate</p>
-                    }
-                    else
-                    {
-                        <p> Data zwrotu: <span style="color: red"> N/A </span></p>
-                        <button class="btn btn-primary btn-danger" @onclick="(() => ReturnFilm(rent.Id))"> Zwróć </button>
-                    }
-                </div>
-            </li>
-        }
-    </ul>
+    <h1> Acces not allowed!!!</h1>
 }
 
 @code {
     private IEnumerable<RentedFilmDto>? rents;
     private RentFilterDto filters = new RentFilterDto();
+    private UserInfo? user;
 
     private IRentService _rentService;
+    private IClientService _clientService;
+    private IFilmStoreService _filmService;
 
     protected override async Task OnInitializedAsync()
     {
         _rentService = new RentService();
+        _clientService = new ClientService();
+        _filmService = new FilmStoreService();
         rents = _rentService.GetAllRents();
+        user = sessionService.GetUser();
     }
 
     public void Filter()
@@ -95,9 +111,19 @@ else
         rents = _rentService.GetAllRents().OrderBy(r => r.RentDate);
     }
 
-    public async void ReturnFilm(string id)
+    public async void ReturnFilm(RentedFilmDto rent)
     {
-        _rentService.ReturnFilm(id);
+
+        var allClients = _clientService.GetAllClients();
+        var client = allClients.FirstOrDefault(c => (c.FirstName == rent.ClientFirstName) && (c.LastName == rent.ClientLastName));
+        if(client != null)
+            _clientService.RemoveOneRentedFilm(client.Id);
+        var allFilms = _filmService.GetAllFilms();
+        var film = allFilms.FirstOrDefault(f => f.Title == rent.FilmTitle);
+
+        _clientService.RemoveOneRentedFilm(client.Id);
+        _filmService.ReturnFilm(film.Id);
+        _rentService.ReturnFilm(rent.Id);
         Task.Delay(1000);
         _rentService.RefreshData();
         rents = _rentService.GetAllRents();
