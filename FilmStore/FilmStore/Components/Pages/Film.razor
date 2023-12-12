@@ -1,0 +1,52 @@
+﻿@page "/Film"
+@page "/Film/{id}"
+@attribute [StreamRendering]
+
+<PageTitle>Films</PageTitle>
+
+<h3>Film</h3>
+
+@if (film != null)
+{
+    <div class="media-body m-3">
+        <h5>@film.Title</h5>
+        <p> Reżyser: @film.Director - Gatunek: @film.Type - czas trwaina: @film.Time min.</p>
+        <p> Ocena: @film.Rate / 10 - Data dodania do sklepu : @film.AddDate.ToString("yyyyMMdd")</p>
+        <ul>
+            @foreach(var actor in film.Actors)
+            {
+                <li> @actor </li>
+            }
+        </ul>
+        <p> Streszczenie : @film.Summary </p>
+        @if(film.IsInStock)
+        {
+            <p style="color: green"> Dostępny</p>
+        }
+        else
+        {
+            <p style="color: red"> Niedostępny</p>
+        }
+    </div>
+}
+else
+{
+    <p> No data!</p>
+}
+
+@code {
+    [Parameter]
+    public string id { get; set; }
+
+    public FilmDto? film { get; set; }
+
+    private IFilmStoreService _filmService;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        _filmService = new FilmStoreService();
+        film = _filmService.GetSingleFilm(id);
+    }
+}
